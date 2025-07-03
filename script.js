@@ -37,8 +37,58 @@ let appData = {
 };
 
 // Google Sheets API configuration
-const scriptURL = 'https://script.google.com/macros/s/AKfycbyghfkHTdPcrI8qjF5Q8ctPs7rDy-Uy8QfFK7QEpFX6BERhYbkJAAVPlo06g-BcjK7f/exec';
-const spreadsheetId = '1kLrzOMwEec-r3rrPSfwGzpowxwnTB4KTLET5mQi02Iw';
+// Update these constants with your actual IDs
+const SCRIPT_URL = 'https://script.google.com/macros/s/1YVCz3MTMc7a9GczAsvVIRUa7_Ok3fk2SvJXU1s6AyK4OT7q-0SEzLi3D/exec';
+const SPREADSHEET_ID = '1kLrzOMwEec-r3rrPSfwGzpowxwnTB4KTLET5mQi02Iw';
+
+async function loadData() {
+  try {
+    const response = await fetch(`${SCRIPT_URL}?action=getData&sheetId=${SPREADSHEET_ID}`);
+    const result = await response.json();
+    
+    if (result.success) {
+      appData = result.data;
+      updateUI();
+    } else {
+      console.error('Error loading data:', result.message);
+    }
+  } catch (error) {
+    console.error('Network error:', error);
+  }
+}
+
+async function saveData() {
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        action: 'saveData',
+        sheetId: SPREADSHEET_ID,
+        data: appData
+      })
+    });
+    
+    const result = await response.json();
+    if (!result.success) {
+      console.error('Error saving data:', result.message);
+    }
+  } catch (error) {
+    console.error('Network error:', error);
+  }
+}
+
+// Update your initialization
+document.addEventListener('DOMContentLoaded', function() {
+  // First load data, then initialize
+  loadData().then(() => {
+    initializeApp();
+    setupEventListeners();
+    updateUI();
+  });
+});
 
 // Currency symbols
 const currencySymbols = {
@@ -590,6 +640,18 @@ function showNotification(message, type = 'info') {
             document.body.removeChild(notification);
         }, 300);
     }, 3000);
+}
+function updateUI() {
+  // Hide loader, show app
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app-content').style.display = 'block';
+  
+  // Update all your UI components
+  updateDashboard();
+  updateTransactionsList();
+  updateSavingsGoalsDisplay();
+  updateBudgetDisplay();
+  setupCharts();
 }
 
 // Add CSS animations
