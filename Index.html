@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body data-theme="light">
+    <div class="app-container">
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div class="page active" id="dashboard">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Welcome back! Here's your financial overview</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- User Welcome Card -->
+                    <div class="card">
+                        <div class="user-info">
+                            <div class="user-avatar" id="userAvatar">
+                                <span id="userInitials">U</span>
+                            </div>
+                            <div>
+                                <div class="greeting" id="userGreeting">Hello, User!</div>
+                                <p style="color: var(--text-secondary); margin-top: 5px;" id="currentDate"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Balance Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Current Balance</h3>
+                            <span class="card-icon"><i class="fas fa-wallet"></i></span>
+                        </div>
+                        <div class="balance-amount" id="totalBalance">$0.00</div>
+                    </div>
+
+                    <!-- Savings Progress Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Savings Goal</h3>
+                            <span class="card-icon"><i class="fas fa-bullseye"></i></span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="savingsProgress" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span id="currentSavings">$0</span>
+                                <span id="savingsGoal">$0</span>
+                            </div>
+                            <div class="progress-percentage" id="savingsPercentage">0%</div>
+                        </div>
+                    </div>
+
+                    <!-- Income Chart Card -->
+                    <div class="card" style="grid-column: span 2;">
+                        <div class="card-header">
+                            <h3 class="card-title">Income Categories</h3>
+                            <span class="card-icon"><i class="fas fa-chart-line"></i></span>
+                        </div>
+                        <div class="pie-chart-container">
+                            <canvas id="incomeChart"></canvas>
+                        </div>
+                        <div class="category-legend" id="incomeLegend"></div>
+                    </div>
+
+                    <!-- Expense Chart Card -->
+                    <div class="card" style="grid-column: span 2;">
+                        <div class="card-header">
+                            <h3 class="card-title">Expense Categories</h3>
+                            <span class="card-icon"><i class="fas fa-chart-bar"></i></span>
+                        </div>
+                        <div class="pie-chart-container">
+                            <canvas id="expenseChart"></canvas>
+                        </div>
+                        <div class="category-legend" id="expenseLegend"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions Page -->
+            <div class="page" id="transactions">
+                <div class="page-header">
+                    <h1 class="page-title">Transactions</h1>
+                    <p class="page-subtitle">Add and manage your income and expenses</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Add Transaction Form -->
+                    <div class="card" style="grid-column: span 2;">
+                        <div class="card-header">
+                            <h3 class="card-title">Add New Transaction</h3>
+                            <span class="card-icon"><i class="fas fa-plus-circle"></i></span>
+                        </div>
+                        <form id="transactionForm">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="form-group">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" class="form-input" id="transactionDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Amount</label>
+                                    <input type="text" class="form-input" id="transactionAmount" placeholder="0.00" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Type</label>
+                                    <select class="form-select" id="transactionType" required>
+                                        <option value="">Select Type</option>
+                                        <option value="income">Income</option>
+                                        <option value="expense">Expense</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Category</label>
+                                    <select class="form-select" id="transactionCategory" required>
+                                        <option value="">Select Category</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Description (Optional)</label>
+                                <input type="text" class="form-input" id="transactionDescription" placeholder="Enter description">
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Add Transaction</button>
+                                <button type="reset" class="btn btn-clear">Clear</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Recent Transactions -->
+                    <div class="card" style="grid-column: span 2;">
+                        <div class="transactions-header">
+                            <div>
+                                <h3 class="card-title">Recent Transactions</h3>
+                            </div>
+                            <button class="btn btn-clear" onclick="clearTransactions()">Clear History</button>
+                        </div>
+                        <div id="transactionsList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Budgeting Page -->
+            <div class="page" id="budgeting">
+                <div class="page-header">
+                    <h1 class="page-title">Budgeting</h1>
+                    <p class="page-subtitle">Plan and manage your monthly budget</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Monthly Budget Planner</h3>
+                        <span class="card-icon"><i class="fas fa-calculator"></i></span>
+                    </div>
+                    
+                    <div class="budget-planner">
+                        <div class="budget-categories">
+                            <div class="budget-category">
+                                <h4>Income</h4>
+                                <div id="incomeBudgetItems"></div>
+                                <button class="btn btn-secondary" onclick="addBudgetItem('income')">
+                                    <i class="fas fa-plus"></i> Add Income
+                                </button>
+                            </div>
+                            
+                            <div class="budget-category">
+                                <h4>Expenses</h4>
+                                <div id="expenseBudgetItems"></div>
+                                <button class="btn btn-secondary" onclick="addBudgetItem('expense')">
+                                    <i class="fas fa-plus"></i> Add Expense
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="budget-summary">
+                            <div class="budget-total">
+                                <h4>Total Income</h4>
+                                <div class="budget-amount" id="totalIncome">$0</div>
+                            </div>
+                            <div class="budget-total">
+                                <h4>Total Expenses</h4>
+                                <div class="budget-amount" id="totalExpenses">$0</div>
+                            </div>
+                            <div class="budget-total">
+                                <h4>Net Budget</h4>
+                                <div class="budget-amount" id="netBudget">$0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Savings Page -->
+            <div class="page" id="savings">
+                <div class="page-header">
+                    <h1 class="page-title">Savings</h1>
+                    <p class="page-subtitle">Track your savings progress and financial goals</p>
+                </div>
+
+                <div class="savings-section">
+                    <!-- Savings Goal Card -->
+                    <div class="savings-goal-card">
+                        <div class="goal-header">
+                            <h3 class="goal-title">Savings Goal</h3>
+                            <span class="goal-icon"><i class="fas fa-bullseye"></i></span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="savingsGoalProgress" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span id="currentSavingsDisplay">$0</span>
+                                <span id="savingsGoalDisplay">$0</span>
+                            </div>
+                            <div class="progress-percentage" id="savingsGoalPercentage">0%</div>
+                        </div>
+                        <div class="goal-purpose">
+                            <div class="goal-purpose-title">Purpose</div>
+                            <div class="goal-purpose-text" id="savingsPurposeText">Savings goal purpose</div>
+                            <span class="goal-purpose-edit" onclick="editPurpose('savings')">Edit Purpose</span>
+                            <input type="text" class="goal-purpose-input" id="savingsPurposeInput" style="display: none;" 
+                                   onblur="savePurpose('savings')" onkeypress="if(event.keyCode === 13) savePurpose('savings')">
+                        </div>
+                    </div>
+
+                    <!-- Add to Savings Form -->
+                    <div class="savings-goal-card">
+                        <div class="goal-header">
+                            <h3 class="goal-title">Add to Savings</h3>
+                            <span class="goal-icon"><i class="fas fa-plus-circle"></i></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Amount</label>
+                            <input type="text" class="form-input" id="savingsAmountInput" placeholder="0.00">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" onclick="addToSavings()">Add to Savings</button>
+                            <button class="btn btn-clear" onclick="resetSavingsForm()">Clear</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div class="page" id="settings">
+                <div class="page-header">
+                    <h1 class="page-title">Settings</h1>
+                    <p class="page-subtitle">Customize your app preferences</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Profile Settings -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Profile</h3>
+                            <span class="card-icon"><i class="fas fa-user"></i></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" id="userName" placeholder="Enter your name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Profile Picture</label>
+                            <div class="file-upload" onclick="document.getElementById('profilePictureInput').click()">
+                                <span style="font-size: 24px;"><i class="fas fa-camera"></i></span>
+                                <div>
+                                    <p><strong>Click to upload a profile picture</strong></p>
+                                    <p style="color: var(--text-secondary); font-size: 0.9rem;">JPG, PNG up to 5MB</p>
+                                </div>
+                            </div>
+                            <input type="file" id="profilePictureInput" accept="image/*" style="display: none;">
+                        </div>
+                        <button class="btn btn-primary" onclick="updateProfile()">Update Profile</button>
+                    </div>
+
+                    <!-- App Settings -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">App Preferences</h3>
+                            <span class="card-icon"><i class="fas fa-cog"></i></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Currency</label>
+                            <select class="form-select" id="currencySelect">
+                                <option value="USD">United States Dollar (USD)</option>
+                                <option value="EUR">Euro (EUR)</option>
+                                <option value="GBP">British Pound (GBP)</option>
+                                <option value="JPY">Japanese Yen (JPY)</option>
+                                <option value="AUD">Australian Dollar (AUD)</option>
+                                <option value="CAD">Canadian Dollar (CAD)</option>
+                                <option value="CNY">Chinese Yuan (CNY)</option>
+                                <option value="INR">Indian Rupee (INR)</option>
+                                <option value="IDR">Indonesian Rupiah (IDR)</option>
+                                <option value="SGD">Singapore Dollar (SGD)</option>
+                            </select>
+                        </div>
+                        <div class="theme-toggle">
+                            <span><i class="fas fa-sun"></i> Light</span>
+                            <div class="toggle-switch" id="themeToggle" onclick="toggleTheme()">
+                                <div class="toggle-slider"></div>
+                            </div>
+                            <span><i class="fas fa-moon"></i> Dark</span>
+                        </div>
+                        <button class="btn btn-primary" style="margin-top: 20px;" onclick="savePreferences()">Save Preferences</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav" id="bottomNav">
+            <div class="nav-item active" data-page="dashboard" title="Dashboard">
+                <span class="nav-icon"><i class="fas fa-chart-pie"></i></span>
+                <span class="nav-text">Dashboard</span>
+            </div>
+            <div class="nav-item" data-page="transactions" title="Transactions">
+                <span class="nav-icon"><i class="fas fa-exchange-alt"></i></span>
+                <span class="nav-text">Transactions</span>
+            </div>
+            <div class="nav-item" data-page="budgeting" title="Budgeting">
+                <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+                <span class="nav-text">Budgeting</span>
+            </div>
+            <div class="nav-item" data-page="savings" title="Savings">
+                <span class="nav-icon"><i class="fas fa-piggy-bank"></i></span>
+                <span class="nav-text">Savings</span>
+            </div>
+            <div class="nav-item" data-page="settings" title="Settings">
+                <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                <span class="nav-text">Settings</span>
+            </div>
+        </nav>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
