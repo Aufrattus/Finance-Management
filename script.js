@@ -1,3 +1,15 @@
+const categoryConfig = {
+  Salary: { icon: '<i class="fas fa-money-bill"></i>', color: '#34d399' },
+  Freelance: { icon: '<i class="fas fa-laptop-code"></i>', color: '#60a5fa' },
+  Investment: { icon: '<i class="fas fa-chart-line"></i>', color: '#fbbf24' },
+  Business: { icon: '<i class="fas fa-briefcase"></i>', color: '#f97316' },
+  Food: { icon: '<i class="fas fa-hamburger"></i>', color: '#ef4444' },
+  Transportation: { icon: '<i class="fas fa-bus"></i>', color: '#3b82f6' },
+  Shopping: { icon: '<i class="fas fa-shopping-cart"></i>', color: '#8b5cf6' },
+  Utilities: { icon: '<i class="fas fa-bolt"></i>', color: '#facc15' },
+  Other: { icon: '<i class="fas fa-ellipsis-h"></i>', color: '#9ca3af' },
+};
+
 // App State
 let appData = {
     user: {
@@ -60,6 +72,7 @@ function initializeApp() {
 
     // Load user preferences
     loadUserData();
+    
 }
 
 function setupEventListeners() {
